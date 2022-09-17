@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/angular-todo-list",
+            "outputPath": "dist/angular_todo_list",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -32,8 +32,8 @@
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "baseHref": "/angular-todo-list/",
-            "deployUrl": "/angular-todo-list/"
+            "baseHref": "/angular_todo_list/",
+            "deployUrl": "/angular_todo_list/"
           },
           "configurations": {
             "production": {
