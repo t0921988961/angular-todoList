@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { LocalStorageService } from 'src/service/local-storage.service';
 
 import * as moment from 'moment';
 import { PrimeNGConfig } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { FormBuilder } from '@angular/forms';
 
 
 @Component({
@@ -24,9 +26,29 @@ export class AppComponent implements OnInit {
 
   filter = 'all'; // all, active, done
 
+
+
+  selectRow: any; // 證物分派表單 打勾
+  /** 證物分派列表 */
+  shareList: any = [
+    { tID: '1', content: '123', time: '2022-09-18 23:48', done: false },
+    { tID: '2', content: '456', time: '2022-09-18 23:48', done: false },
+    { tID: '3', content: '789', time: '2022-09-18 23:48', done: false }
+  ];
+  /** 證物分派列表 table欄位 */
+  colShareList = [
+    { field: 'Select', header: '選擇' },
+    { field: 'tID', header: '證物編號' },
+    // { field: 'Sort', header: '編號' },
+    { field: 'content', header: '內容' },
+    { field: 'time', header: '時間' },
+    { field: 'Function', header: '功能' },
+  ];
+
   constructor(
     private primengConfig: PrimeNGConfig,
     public localStorage: LocalStorageService,
+    private formBuilder: FormBuilder,
   ) {
     this.initPrimeNg();
     this.localStorage.save('initTodo', [])
@@ -43,8 +65,6 @@ export class AppComponent implements OnInit {
     // setTimeout(() => { this.updateTodo('initTodo', '1', 456789); }, 4000)
     // setTimeout(() => { this.deleteTodo('initTodo', '1'); }, 8000)
     // setTimeout(() => { this.clearAllTodo('initTodo'); }, 12000)
-
-    this.createTodo('initTodo', this.todoArr);
   }
 
   setTodoId(todos: {}[]) {
@@ -122,6 +142,12 @@ export class AppComponent implements OnInit {
       default:
         return this.todoArr;
     }
+  }
+
+
+  // 檢查checkbox
+  checkSelectedTestUser() {
+
   }
 
 
