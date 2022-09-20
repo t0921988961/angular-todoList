@@ -23,6 +23,30 @@ import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { DropdownModule } from 'primeng/dropdown';
+import { TreeTableModule } from 'primeng/treetable';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { StepsModule } from 'primeng/steps';
+import { RatingModule } from 'primeng/rating';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { PickListModule } from 'primeng/picklist';
+import { MegaMenuModule } from 'primeng/megamenu';
+import { CheckboxModule } from 'primeng/checkbox';
+import { PanelModule } from 'primeng/panel';
+import { RippleModule } from 'primeng/ripple';
+import { PaginatorModule } from 'primeng/paginator';
+import { BlockUIModule } from 'primeng/blockui';
+import { ChipsModule } from 'primeng/chips';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { InputMaskModule } from 'primeng/inputmask';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { TooltipModule } from 'primeng/tooltip';
+import { TabViewModule } from 'primeng/tabview';
+import { TreeModule } from 'primeng/tree';
+import { PasswordModule } from 'primeng/password';
 
 
 @NgModule({
@@ -49,7 +73,41 @@ import { DropdownModule } from 'primeng/dropdown';
     ButtonModule,
     ToastModule,
     ProgressBarModule,
-    HttpClientModule,
+    TreeTableModule,
+    TableModule,
+    ToastModule,
+    CalendarModule,
+    SliderModule,
+    MultiSelectModule,
+    ContextMenuModule,
+    DialogModule,
+    DropdownModule,
+    ProgressBarModule,
+    InputTextModule,
+    InputTextareaModule,
+    StepsModule,
+    AccordionModule,
+    RatingModule,
+    RadioButtonModule,
+    ConfirmDialogModule,
+    DynamicDialogModule,
+    InputNumberModule,
+    SelectButtonModule,
+    PickListModule,
+    MegaMenuModule,
+    CheckboxModule,
+    PanelModule,
+    PaginatorModule,
+    BlockUIModule,
+    ChipsModule,
+    ProgressSpinnerModule,
+    InputMaskModule,
+    BreadcrumbModule,
+    RippleModule,
+    ButtonModule,
+    TooltipModule,
+    TreeModule,
+    PasswordModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
