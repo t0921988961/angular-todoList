@@ -1,14 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { LocalStorageService } from 'src/service/local-storage.service';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import * as moment from 'moment';
+
+import { nanoid as randomId } from 'nanoid';
 
 /*-- PrimeNg --*/
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { DialogService } from 'primeng/dynamicdialog';
+import { LayoutService } from './service/layout.service';
 
 @Component({
   selector: 'app-root',
@@ -18,70 +21,115 @@ import { DialogService } from 'primeng/dynamicdialog';
 })
 
 
-
 export class AppComponent implements OnInit {
 
-
-  title = 'angular-todo-list';
-
-  todoArr: { tId?: string, content: string, done: boolean }[] = [
-    { content: '123', done: false },
-    { content: '456', done: false },
-    { content: '789', done: true }
+  initTodo: any = [
+    { tId: 'NcMjBXBIDWlrNVCIjaA14', content: '123', time: '2020-09-17 20:48:20', done: false },
+    { tId: 'cBzgv-S8SJwbBjqijX6xv', content: '456', time: '2021-09-18 21:48:30', done: true },
+    { tId: 'JXlsjKX8c81poDoPenXDL', content: '789', time: '2022-09-19 22:48:40', done: false },
+    { tId: 'Pl-Zbw31MNBC1KgCOVcMO', content: '123', time: '2022-09-20 23:48:50', done: false }
   ];
 
   filter = 'all'; // all, active, done
+  inputContent: any;
 
   displayEdit = false; // dialog edit todo
   selectRow: any; // 證物分派表單 打勾
   loading = false; // table is loading
   /** 證物分派列表 */
-  shareList: any = [
-    { tID: '1', content: '123', time: '2020-09-17 23:48', done: false },
-    { tID: '2', content: '456', time: '2021-09-18 23:48', done: false },
-    { tID: '3', content: '789', time: '2022-09-19 23:48', done: false }
-  ];
+  shareList: any = [];
   /** 證物分派列表 table欄位 */
   colShareList = [
-    { field: 'Select', header: '完成' },
-    // { field: 'tID', header: '編號' },
-    // { field: 'Sort', header: '編號' },
+    { field: 'select', header: '完成' },
+    { field: 'tId', header: 'ID' },
     { field: 'content', header: '內容' },
     { field: 'time', header: '時間' },
-    { field: 'Function', header: '功能' },
+    { field: 'function', header: '功能' },
   ];
 
+  editTodo: any;
   editForm = this.formBuilder.group({
-    content: ['',], // todo content
+    content: ['', Validators.required], // todo content
   })
 
   constructor(
     private primengConfig: PrimeNGConfig,
     public localStorage: LocalStorageService,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService, // primeng 確認 取消
+    // primeng
+    private confirmationService: ConfirmationService,
+    public messageService: MessageService,
+    public layoutService: LayoutService
   ) {
     this.initPrimeNg();
-    this.localStorage.save('initTodo', [])
-    console.log('moment', moment().format(''))
+    this.localStorage.save('initTodo', this.initTodo);
   }
 
   ngOnInit() {
-    // TEST
-    // this.readTodo('initTodo');
-    // this.createTodo('initTodo', { content: 123 });
-    // this.createTodo('initTodo', { content: 456 });
-    // this.createTodo('initTodo', { content: 789 });
+    this.readTodo('initTodo');
 
-    // setTimeout(() => { this.updateTodo('initTodo', '1', 456789); }, 4000)
-    // setTimeout(() => { this.deleteTodo('initTodo', '1'); }, 8000)
-    // setTimeout(() => { this.clearAllTodo('initTodo'); }, 12000)
+    this.layoutService.setPageLoading(false);
   }
 
   @ViewChild('dtExhibit') dt: any;
 
   applyFilterGlobal($event: any, stringVal: any) {
     this.dt.filterGlobal(($event.target as HTMLInputElement).value, stringVal);
+  }
+
+  // 排序時間
+  sortByTime(arr: []) {
+    arr.sort((a: any, b: any) => {
+      return <any>new Date(b.time) - <any>new Date(a.time);
+    })
+    console.log('排序時間 arr:', arr)
+  }
+
+  // 組裝 todo
+  buildTodo(content: string) {
+    let params = { tId: randomId(), content: content.trim(), time: moment().format('YYYY-MM-DD HH:mm:ss'), done: false };
+    this.createTodo('initTodo', params);
+    this.readTodo('initTodo');
+    this.inputContent = '';
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Create success',
+      detail: '',
+      icon: 'bounce animated',
+      life: 3000,
+    });
+  }
+
+  // 準備更新
+  doUpdate(rowData: any) {
+    this.editTodo = rowData;
+    this.displayEdit = true;
+
+  }
+
+  // 確認更新
+  confirmUpdate() {
+    this.updateTodo('initTodo', this.editTodo.tId, this.editForm.value.content);
+    this.readTodo('initTodo');
+    this.displayEdit = false;
+    this.editTodo = '';
+  }
+
+  // 刪除
+  prepareDelete(rowData: any) {
+    this.confirmationService.confirm({
+      key: 'confirm',
+      header: `刪除`,
+      icon: 'fa fa-trash',
+      message: `是否要刪除「<strong>${rowData.tId}</strong>」？`,
+      accept: () => {
+        this.deleteTodo('initTodo', rowData.tId);
+        this.readTodo('initTodo');
+      },
+      reject: () => {
+      },
+    });
   }
 
   setTodoId(todos: {}[]) {
@@ -91,63 +139,34 @@ export class AppComponent implements OnInit {
   }
 
   createTodo(KEY: string, todo: object) {
-    // 1 讀取
     const todos: any = this.localStorage.load(KEY);
     todos.push(todo);
     this.localStorage.save(KEY, this.setTodoId(todos));
-    // 3 return
-    return { tId: todos?.length - 1, todos }
   }
 
   readTodo(KEY: string) {
-    // 1 讀取
     const todos: any = this.localStorage.load(KEY);
-    // 2 給值
-    this.todoArr = todos;
-    // 3 return
-    return todos
+    this.sortByTime(todos)
+    this.shareList = todos;
   }
 
   updateTodo(KEY: string, tId: string, content: any) {
-
-    this.displayEdit = true;
-
-    // deleteTodo
-    const todos: any = this.localStorage.load(KEY);
-    todos[tId].content = content;
+    console.log('content:', content)
+    let todos: any = this.localStorage.load(KEY);
+    todos.map((item: any) => {
+      if (item.tId === tId) { item.content = content }
+      return item
+    })
+    this.editForm.reset();
     this.localStorage.save(KEY, todos);
-    // 3 return
-    return {
-      tId,
-      content: todos[tId]
-    }
   }
 
   deleteTodo(KEY: string, tId: string) {
-
-    this.confirmationService.confirm({
-      key: 'confirm',
-      header: `刪除`,
-      icon: 'fa fa-trash',
-      message: `是否要刪除「<strong>${tId}</strong>」？`,
-      accept: () => {
-        // 確認
-      },
-
-      reject: () => {
-        // 取消
-      },
-    });
-
-    // deleteTodo
     const todos: any = this.localStorage.load(KEY);
-    const spliceTodo = todos.splice(tId, 1);
+    let idx = todos.findIndex((item: any) => item.tId === tId);
+    const spliceTodo = todos.splice(idx, 1);
     this.localStorage.save(KEY, todos);
-    // 3 return
-    return {
-      tId: null,
-      spliceTodo
-    }
+    return spliceTodo;
   }
 
   clearAllTodo(KEY: string) {
@@ -159,23 +178,23 @@ export class AppComponent implements OnInit {
   }
 
   filterResult(filter: string) {
-    this.todoArr = this.filterList(filter);
+    this.shareList = this.filterList(filter);
   }
 
   filterList(filter: string) {
     // all, active, done
     switch (filter) {
       case 'all':
-        return this.todoArr;
+        return this.shareList;
         break
       case 'active':
-        return this.todoArr.filter((todo) => !todo.done)
+        return this.shareList.filter((todo: any) => !todo.done)
         break
       case 'done':
-        return this.todoArr.filter((todo) => todo.done);
+        return this.shareList.filter((todo: any) => todo.done);
         break
       default:
-        return this.todoArr;
+        return this.shareList;
     }
   }
 

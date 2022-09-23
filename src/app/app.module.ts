@@ -47,6 +47,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
 import { TreeModule } from 'primeng/tree';
 import { PasswordModule } from 'primeng/password';
+import { LayoutService } from './service/layout.service';
 
 
 @NgModule({
@@ -71,7 +72,6 @@ import { PasswordModule } from 'primeng/password';
     ContextMenuModule,
     DropdownModule,
     ButtonModule,
-    ToastModule,
     ProgressBarModule,
     TreeTableModule,
     TableModule,
@@ -109,7 +109,9 @@ import { PasswordModule } from 'primeng/password';
     TreeModule,
     PasswordModule,
   ],
-  providers: [],
+  providers: [
+    LayoutService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

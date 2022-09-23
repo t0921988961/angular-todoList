@@ -1,30 +1,39 @@
+<p-toast></p-toast>
 <!-- Table 資料欄位 -->
 <div class="row justify-content-center mt-5 p-5">
-  <div class="card">
-    <input
-      type="text"
-      [(ngModel)]="filter"
-      (change)="filterResult(filter)"
-      pInputText
-    />
-    <p>Show:{{ filter }}</p>
-    <p>all, active, done</p>
+  <div class="col-9 card">
+    <h2 class="p-3 text-center font-weight-bold">Todo List</h2>
+    <div class="row no-gutters justify-content-center p-3">
+      <div class="col-9 px-3">
+        <input
+          class="w-100"
+          type="text"
+          [(ngModel)]="inputContent"
+          pInputText
+        />
+      </div>
 
-    <ul>
-      <li *ngFor="let item of todoArr">
-        Id:{{ item?.tId }}<br />
-        content:{{ item?.content }}<br />
-        Done:{{ item?.done }}<br />
-      </li>
-    </ul>
+      <div class="col-3 px-3">
+        <button
+          pButton
+          icon="pi "
+          type="button"
+          label="確定"
+          class="p-button-primary mr-3"
+          [disabled]="!inputContent"
+          (click)="buildTodo(inputContent)"
+        ></button>
+      </div>
+    </div>
+    <p>all, active, done</p>
 
     <p-table
       #dtExhibit
+      dataKey="tId"
       [columns]="colShareList"
       [value]="shareList"
       [(selection)]="selectRow"
       selectionMode="single"
-      dataKey="tID"
       styleClass="p-datatable-customers"
       [rowHover]="true"
       [rows]="10"
@@ -49,7 +58,7 @@
               <p-sortIcon field="{{ col.field }}"></p-sortIcon>
             </th>
 
-            <th scope="col" *ngSwitchCase="'Function'">
+            <th scope="col" *ngSwitchCase="'function'">
               {{ col.header }}
             </th>
           </ng-container>
@@ -64,7 +73,7 @@
               (input)="applyFilterGlobal($event, 'contains')"
             />
 
-            <div *ngSwitchCase="'Select'">
+            <div *ngSwitchCase="'select'">
               <p-tableHeaderCheckbox
                 (click)="checkSelectedTestUser()"
               ></p-tableHeaderCheckbox>
@@ -91,14 +100,14 @@
               {{ rowData[col.field] }}
             </ng-container>
 
-            <ng-container *ngSwitchCase="'Select'">
+            <ng-container *ngSwitchCase="'select'">
               <p-tableCheckbox
                 [value]="rowData"
                 (click)="checkSelectedTestUser()"
               ></p-tableCheckbox>
             </ng-container>
 
-            <ng-container *ngSwitchCase="'Function'">
+            <ng-container *ngSwitchCase="'function'">
               <div class="btn__action">
                 <button
                   pButton
@@ -106,7 +115,7 @@
                   label="編輯"
                   type="button"
                   class="p-button-ingo p-ripple mr-3"
-                  (click)="updateTodo('initTodo', '1', 456789)"
+                  (click)="doUpdate(rowData)"
                 ></button>
 
                 <button
@@ -115,7 +124,7 @@
                   label="刪除"
                   type="button"
                   class="p-button-danger p-ripple"
-                  (click)="deleteTodo('initTodo', '1')"
+                  (click)="prepareDelete(rowData)"
                 ></button>
               </div>
             </ng-container>
@@ -130,6 +139,14 @@
     </p-table>
   </div>
 </div>
+
+<ul>
+  <li *ngFor="let item of shareList">
+    tId:{{ item?.tId }}<br />
+    content:{{ item?.content }}<br />
+    Done:{{ item?.done }}<br />
+  </li>
+</ul>
 
 <!-- Dailog delete Todo -->
 <p-confirmDialog #cd [key]="'confirm'" [style]="{ width: '50vw' }">
@@ -158,6 +175,9 @@
   header="Edit Todo"
   [(visible)]="displayEdit"
   [style]="{ width: '50vw' }"
+  [modal]="true"
+  [dismissableMask]="false"
+  [draggable]="false"
 >
   <form [formGroup]="editForm">
     <div class="row">
@@ -189,6 +209,8 @@
       label="確認"
       type="button"
       class="p-button-info p-ripple"
+      [disabled]="editForm.invalid"
+      (click)="confirmUpdate()"
     ></button>
 
     <button
@@ -197,6 +219,15 @@
       label="取消"
       type="button"
       class="p-button-danger p-ripple"
+      (click)="displayEdit = false"
     ></button>
   </ng-template>
 </p-dialog>
+
+<!-- loading -->
+<p-blockUI
+  [baseZIndex]="999999"
+  [blocked]="$any(this.layoutService.pageLoading$ | async)"
+>
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
