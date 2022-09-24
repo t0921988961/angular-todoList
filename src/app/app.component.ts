@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
   inputContent: any;
 
   displayEdit = false; // dialog edit todo
-  selectRow: any; // 證物分派表單 打勾
+  selectedRows: any; // 證物分派表單 打勾
   loading = false; // table is loading
   /** 證物分派列表 */
   shareList: any = [];
@@ -146,18 +146,28 @@ export class AppComponent implements OnInit {
 
   readTodo(KEY: string) {
     const todos: any = this.localStorage.load(KEY);
-    this.sortByTime(todos)
+    this.sortByTime(todos);
     this.shareList = todos;
+    this.initSelect();
   }
 
   updateTodo(KEY: string, tId: string, content: any) {
-    console.log('content:', content)
     let todos: any = this.localStorage.load(KEY);
     todos.map((item: any) => {
       if (item.tId === tId) { item.content = content }
       return item
     })
     this.editForm.reset();
+    this.localStorage.save(KEY, todos);
+  }
+
+
+  closeTodo(KEY: string, tId: string) {
+    let todos: any = this.localStorage.load(KEY);
+    todos.map((item: any) => {
+      if (item.tId === tId) { item.done = !item.done }
+      return item
+    })
     this.localStorage.save(KEY, todos);
   }
 
@@ -182,26 +192,26 @@ export class AppComponent implements OnInit {
   }
 
   filterList(filter: string) {
+    const todos: any = this.localStorage.load('initTodo');
     // all, active, done
-    switch (filter) {
-      case 'all':
-        return this.shareList;
-        break
-      case 'active':
-        return this.shareList.filter((todo: any) => !todo.done)
-        break
-      case 'done':
-        return this.shareList.filter((todo: any) => todo.done);
-        break
-      default:
-        return this.shareList;
-    }
+    if (filter === 'all') { return todos; }
+    if (filter === 'active') { return todos.filter((todo: any) => !todo.done) }
+    if (filter === 'done') { return todos.filter((todo: any) => todo.done); }
+    else { return todos; }
   }
 
 
   // 檢查checkbox
-  checkSelectedTestUser() {
+  initSelect() {
+    this.selectedRows = this.shareList.filter((item: any) => item.done === true);
+    console.log('this.selectedRows:', this.selectedRows)
+  }
 
+
+  // 打勾完成
+  selectRow(rowData: any) {
+    this.closeTodo('initTodo', rowData.tId);
+    this.readTodo('initTodo');
   }
 
 
