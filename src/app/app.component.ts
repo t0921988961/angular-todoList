@@ -2,9 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { LocalStorageService } from 'src/service/local-storage.service';
 import { FormBuilder, Validators } from '@angular/forms';
 
+
+import { nanoid as randomId } from 'nanoid'; // nonoid
 import * as moment from 'moment';
 
-import { nanoid as randomId } from 'nanoid';
+import { of } from 'rxjs';
+import { tap, map, switchMap, finalize } from 'rxjs/operators';
 
 /*-- PrimeNg --*/
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -24,21 +27,41 @@ import { LayoutService } from './service/layout.service';
 export class AppComponent implements OnInit {
 
   initTodo: any = [
-    { tId: 'NcMjBXBIDWlrNVCIjaA14', content: '123', time: '2020-09-17 20:48:20', done: false },
-    { tId: 'cBzgv-S8SJwbBjqijX6xv', content: '456', time: '2021-09-18 21:48:30', done: true },
-    { tId: 'JXlsjKX8c81poDoPenXDL', content: '789', time: '2022-09-19 22:48:40', done: false },
-    { tId: 'Pl-Zbw31MNBC1KgCOVcMO', content: '123', time: '2022-09-20 23:48:50', done: false }
+    {
+      tId: 'NcMjBXBIDWlrNVCIjaA14',
+      content: 'Perspiciatis sunt non aut culpa omnis saepe.',
+      time: '2020-09-17 20:48:20',
+      done: false
+    },
+    {
+      tId: 'cBzgv-S8SJwbBjqijX6xv',
+      content: 'Eaque eum blanditiis nisi.',
+      time: '2021-09-18 21:48:30',
+      done: true
+    },
+    {
+      tId: 'JXlsjKX8c81poDoPenXDL',
+      content: 'Dolorum sint natus aut dolores rerum voluptate hic.',
+      time: '2022-09-19 22:48:40',
+      done: false
+    },
+    {
+      tId: 'Pl-Zbw31MNBC1KgCOVcMO',
+      content: 'Numquam in laboriosam corporis eveniet dolor odio.',
+      time: '2022-09-20 23:48:50',
+      done: false
+    }
   ];
 
   filter = 'all'; // all, active, done
-  inputContent: any;
+  inputContent = '';
 
   displayEdit = false; // dialog edit todo
-  selectedRows: any; // 證物分派表單 打勾
+  selectedRows: any; // selected todo
   loading = false; // table is loading
-  /** 證物分派列表 */
+  /** Todo列表 */
   shareList: any = [];
-  /** 證物分派列表 table欄位 */
+  /** Todo列表 table欄位 */
   colShareList = [
     { field: 'select', header: '完成' },
     { field: 'tId', header: 'ID' },
@@ -70,10 +93,11 @@ export class AppComponent implements OnInit {
     this.layoutService.setPageLoading(false);
   }
 
-  @ViewChild('dtExhibit') dt: any;
+  @ViewChild('dtExhibit') echibitRef: any;
 
+  // table 欄位搜尋
   applyFilterGlobal($event: any, stringVal: any) {
-    this.dt.filterGlobal(($event.target as HTMLInputElement).value, stringVal);
+    this.echibitRef.filterGlobal(($event.target as HTMLInputElement).value, stringVal);
   }
 
   // 排序時間
@@ -81,40 +105,54 @@ export class AppComponent implements OnInit {
     arr.sort((a: any, b: any) => {
       return <any>new Date(b.time) - <any>new Date(a.time);
     })
-    console.log('排序時間 arr:', arr)
   }
 
   // 組裝 todo
   buildTodo(content: string) {
     let params = { tId: randomId(), content: content.trim(), time: moment().format('YYYY-MM-DD HH:mm:ss'), done: false };
-    this.createTodo('initTodo', params);
-    this.readTodo('initTodo');
-    this.filterResult(this.filter);
-    this.inputContent = '';
-
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Create success',
-      detail: '',
-      icon: 'bounce animated',
-      life: 3000,
-    });
+    of(this.layoutService.setPageLoading(true)).pipe(
+      tap(() => this.createTodo('initTodo', params)),
+      tap(() => this.readTodo('initTodo')),
+      tap(() => this.filterResult(this.filter)),
+      tap(() => this.inputContent = ''),
+      finalize(() => this.layoutService.setPageLoading(false)),
+    ).subscribe((res) => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Create success',
+        detail: '',
+        icon: 'bounce animated',
+        life: 3000,
+      });
+    })
   }
 
   // 準備更新
   doUpdate(rowData: any) {
     this.editTodo = rowData;
+    this.editForm.patchValue({ content: rowData.content });
     this.displayEdit = true;
 
   }
 
   // 確認更新
   confirmUpdate() {
-    this.updateTodo('initTodo', this.editTodo.tId, this.editForm.value.content);
-    this.readTodo('initTodo');
-    this.filterResult(this.filter);
-    this.displayEdit = false;
-    this.editTodo = '';
+    of(this.layoutService.setPageLoading(true)).pipe(
+      tap(() => this.updateTodo('initTodo', this.editTodo.tId, this.editForm.value.content)),
+      tap(() => this.readTodo('initTodo')),
+      tap(() => this.filterResult(this.filter)),
+      tap(() => this.displayEdit = false),
+      tap(() => this.editTodo = ''),
+      finalize(() => this.layoutService.setPageLoading(false)),
+    ).subscribe((res) => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Update success',
+        detail: '',
+        icon: 'bounce animated',
+        life: 3000,
+      });
+    })
   }
 
   // 刪除
@@ -125,37 +163,54 @@ export class AppComponent implements OnInit {
       icon: 'fa fa-trash',
       message: `是否要刪除「<strong>${rowData.tId}</strong>」？`,
       accept: () => {
-        this.deleteTodo('initTodo', rowData.tId);
-        this.readTodo('initTodo');
-        this.filterResult(this.filter);
+        of(this.layoutService.setPageLoading(true)).pipe(
+          tap(() => this.deleteTodo('initTodo', rowData.tId)),
+          tap(() => this.readTodo('initTodo')),
+          tap(() => this.filterResult(this.filter)),
+          finalize(() => this.layoutService.setPageLoading(false)),
+        ).subscribe((res) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Delete success',
+            detail: '',
+            icon: 'bounce animated',
+            life: 3000,
+          });
+        })
       },
       reject: () => {
       },
     });
   }
 
-  // 檢查checkbox
+  // 初始化 畫面打勾
   initSelect() {
     this.selectedRows = this.shareList.filter((item: any) => item.done === true);
   }
 
   // 打勾完成
   selectRow(rowData: any) {
-    this.closeTodo('initTodo', rowData.tId);
-    this.readTodo('initTodo');
-    this.filterResult(this.filter);
-  }
-
-  setTodoId(todos: {}[]) {
-    return todos.map((todo, idx) => {
-      return { tId: idx, ...todo }
+    of(this.layoutService.setPageLoading(true)).pipe(
+      tap(() => this.closeTodo('initTodo', rowData.tId)),
+      tap(() => this.readTodo('initTodo')),
+      tap(() => this.filterResult(this.filter)),
+      finalize(() => this.layoutService.setPageLoading(false)),
+    ).subscribe((res) => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Done success',
+        detail: '',
+        icon: 'bounce animated',
+        life: 3000,
+      });
     })
   }
+
 
   createTodo(KEY: string, todo: object) {
     const todos: any = this.localStorage.load(KEY);
     todos.push(todo);
-    this.localStorage.save(KEY, this.setTodoId(todos));
+    this.localStorage.save(KEY, todos);
   }
 
   readTodo(KEY: string) {
@@ -175,6 +230,14 @@ export class AppComponent implements OnInit {
     this.localStorage.save(KEY, todos);
   }
 
+  deleteTodo(KEY: string, tId: string) {
+    const todos: any = this.localStorage.load(KEY);
+    let idx = todos.findIndex((item: any) => item.tId === tId);
+    const spliceTodo = todos.splice(idx, 1);
+    this.localStorage.save(KEY, todos);
+    return spliceTodo;
+  }
+
 
   closeTodo(KEY: string, tId: string) {
     let todos: any = this.localStorage.load(KEY);
@@ -185,24 +248,11 @@ export class AppComponent implements OnInit {
     this.localStorage.save(KEY, todos);
   }
 
-  deleteTodo(KEY: string, tId: string) {
-    const todos: any = this.localStorage.load(KEY);
-    let idx = todos.findIndex((item: any) => item.tId === tId);
-    const spliceTodo = todos.splice(idx, 1);
-    this.localStorage.save(KEY, todos);
-    return spliceTodo;
-  }
 
-  clearAllTodo(KEY: string) {
-    const todos: Array<{}> = [];
-    this.localStorage.save('initTodo', todos);
-    return {
-      todos
-    }
-  }
-
+  // Todo分類
   filterResult(filter: string) {
     this.shareList = this.filterList(filter);
+    this.sortByTime(this.shareList);
   }
 
   filterList(filter: string) {
@@ -215,50 +265,8 @@ export class AppComponent implements OnInit {
   }
 
 
-
-
-
-
   // primeng Init
   initPrimeNg() {
     this.primengConfig.ripple = true;
-    this.primengConfig.setTranslation({
-      accept: '確認',
-      reject: '取消',
-      dayNames: ['日', '一', '二', '三', '四', '五', '六'],
-      dayNamesShort: ['日', '一', '二', '三', '四', '五', '六'],
-      dayNamesMin: ['日', '一', '二', '三', '四', '五', '六'],
-      monthNames: [
-        '一月',
-        '二月',
-        '三月',
-        '四月',
-        '五月',
-        '六月',
-        '七月',
-        '八月',
-        '九月',
-        '十月',
-        '十一月',
-        '十二月',
-      ],
-      monthNamesShort: [
-        '一月',
-        '二月',
-        '三月',
-        '四月',
-        '五月',
-        '六月',
-        '七月',
-        '八月',
-        '九月',
-        '十月',
-        '十一月',
-        '十二月',
-      ],
-      today: '確認',
-      clear: '清除',
-      weekHeader: 'Wk',
-    });
   }
 }

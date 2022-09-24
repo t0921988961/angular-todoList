@@ -3,8 +3,8 @@
 <div class="row justify-content-center mt-5 p-5">
   <div class="col-9 card">
     <h2 class="p-3 font-weight-bold">Angular Todo List</h2>
-    <div class="row no-gutters justify-content-center p-3">
-      <div class="col-9 px-3">
+    <div class="row no-gutters justify-content-start p-3">
+      <div class="col-8 pr-3">
         <input
           class="w-100"
           type="text"
@@ -13,12 +13,12 @@
         />
       </div>
 
-      <div class="col-3 px-3">
+      <div class="col-4 px-3">
         <button
           pButton
-          icon="pi "
+          icon=""
           type="button"
-          label="確定"
+          label="建立"
           class="p-button-primary mr-3"
           [disabled]="!inputContent"
           (click)="buildTodo(inputContent)"
@@ -184,14 +184,6 @@
   </div>
 </div>
 
-<ul>
-  <li *ngFor="let item of shareList">
-    tId:{{ item?.tId }}<br />
-    content:{{ item?.content }}<br />
-    Done:{{ item?.done }}<br />
-  </li>
-</ul>
-
 <!-- Dailog delete Todo -->
 <p-confirmDialog #cd [key]="'confirm'" [style]="{ width: '50vw' }">
   <ng-template pTemplate="footer">
@@ -269,9 +261,6 @@
 </p-dialog>
 
 <!-- loading -->
-<p-blockUI
-  [baseZIndex]="999999"
-  [blocked]="$any(this.layoutService.pageLoading$ | async)"
->
+<p-blockUI [blocked]="$any(this.layoutService.pageLoading$ | async)">
   <p-progressSpinner></p-progressSpinner>
 </p-blockUI>
