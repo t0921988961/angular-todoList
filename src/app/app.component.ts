@@ -67,7 +67,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.readTodo('initTodo');
-
     this.layoutService.setPageLoading(false);
   }
 
@@ -90,6 +89,7 @@ export class AppComponent implements OnInit {
     let params = { tId: randomId(), content: content.trim(), time: moment().format('YYYY-MM-DD HH:mm:ss'), done: false };
     this.createTodo('initTodo', params);
     this.readTodo('initTodo');
+    this.filterResult(this.filter);
     this.inputContent = '';
 
     this.messageService.add({
@@ -112,6 +112,7 @@ export class AppComponent implements OnInit {
   confirmUpdate() {
     this.updateTodo('initTodo', this.editTodo.tId, this.editForm.value.content);
     this.readTodo('initTodo');
+    this.filterResult(this.filter);
     this.displayEdit = false;
     this.editTodo = '';
   }
@@ -126,10 +127,23 @@ export class AppComponent implements OnInit {
       accept: () => {
         this.deleteTodo('initTodo', rowData.tId);
         this.readTodo('initTodo');
+        this.filterResult(this.filter);
       },
       reject: () => {
       },
     });
+  }
+
+  // 檢查checkbox
+  initSelect() {
+    this.selectedRows = this.shareList.filter((item: any) => item.done === true);
+  }
+
+  // 打勾完成
+  selectRow(rowData: any) {
+    this.closeTodo('initTodo', rowData.tId);
+    this.readTodo('initTodo');
+    this.filterResult(this.filter);
   }
 
   setTodoId(todos: {}[]) {
@@ -201,18 +215,7 @@ export class AppComponent implements OnInit {
   }
 
 
-  // 檢查checkbox
-  initSelect() {
-    this.selectedRows = this.shareList.filter((item: any) => item.done === true);
-    console.log('this.selectedRows:', this.selectedRows)
-  }
 
-
-  // 打勾完成
-  selectRow(rowData: any) {
-    this.closeTodo('initTodo', rowData.tId);
-    this.readTodo('initTodo');
-  }
 
 
 
