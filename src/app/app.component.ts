@@ -258,8 +258,11 @@ export class AppComponent implements OnInit {
 
   // Todo分類
   filterResult(filter: string) {
-    this.shareList = this.filterList(filter);
-    this.sortByTime(this.shareList);
+    of(this.layoutService.setPageLoading(true)).pipe(
+      tap(() => this.shareList = this.filterList(filter)),
+      tap(() => this.sortByTime(this.shareList)),
+      finalize(() => this.layoutService.setPageLoading(false)),
+    ).subscribe();
   }
 
   filterList(filter: string) {
