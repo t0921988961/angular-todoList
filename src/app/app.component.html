@@ -1,7 +1,7 @@
 <p-toast></p-toast>
 <!-- Table 資料欄位 -->
 <div class="row justify-content-center mt-5 p-5">
-  <div class="col-9 card">
+  <div class="col-lg-9 col-md-12 card p-2">
     <h2 class="p-3 font-weight-bold">Angular Todo List</h2>
     <div class="row no-gutters justify-content-start p-3">
       <div class="col-8 pr-3">
@@ -25,12 +25,14 @@
         ></button>
       </div>
 
-      <div class="col-12 row mb-4 py-4 align-items-baseline">
-        <label for="userName" class="col-sm-2 col-form-label"
+      <div class="col-12 row mb-4 py-4 align-items-baseline flex-wrap">
+        <label for="userName" class="col-lg-2 col-sm-12 col-form-label"
           >Filter Todo：
         </label>
-        <div class="col-sm-10 d-flex">
-          <div class="mr-2 d-flex align-items-baseline mr-5 cursor-pointer">
+        <div class="col-sm-10 d-flex flex-wrap">
+          <div
+            class="col-lg-1 col-md-3 col-sm-12 mr-2 d-flex align-items-baseline mr-5 cursor-pointer"
+          >
             <p-radioButton
               name="filter_1"
               [(ngModel)]="filter"
@@ -41,7 +43,9 @@
             <label for="filter_1" class="cursor-pointer ml-3">All</label>
           </div>
 
-          <div class="mr-2 d-flex align-items-baseline mr-5 cursor-pointer">
+          <div
+            class="col-lg-1 col-md-3 col-sm-12 mr-2 d-flex align-items-baseline mr-5 cursor-pointer"
+          >
             <p-radioButton
               name="filter_2"
               [(ngModel)]="filter"
@@ -52,7 +56,9 @@
             <label for="filter_2" class="cursor-pointer ml-3">Active</label>
           </div>
 
-          <div class="mr-2 d-flex align-items-baseline cursor-pointer">
+          <div
+            class="col-lg-1 col-md-3 col-sm-12 mr-2 d-flex align-items-baseline cursor-pointer"
+          >
             <p-radioButton
               name="filter_3"
               [(ngModel)]="filter"
@@ -78,7 +84,6 @@
       [rows]="10"
       [showCurrentPageReport]="true"
       [rowsPerPageOptions]="[10, 25, 50]"
-      [loading]="loading"
       [paginator]="true"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
       [filterDelay]="0"

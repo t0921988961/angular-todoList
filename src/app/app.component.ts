@@ -16,6 +16,14 @@ import { Table } from 'primeng/table';
 import { DialogService } from 'primeng/dynamicdialog';
 import { LayoutService } from './service/layout.service';
 
+
+export interface TodoObject {
+  tId: string;
+  content: string;
+  time: string;
+  done: boolean;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -26,7 +34,7 @@ import { LayoutService } from './service/layout.service';
 
 export class AppComponent implements OnInit {
 
-  initTodo: any = [
+  initTodo: Array<TodoObject> = [
     {
       tId: 'NcMjBXBIDWlrNVCIjaA14',
       content: 'Perspiciatis sunt non aut culpa omnis saepe.',
@@ -58,7 +66,6 @@ export class AppComponent implements OnInit {
 
   displayEdit = false; // dialog edit todo
   selectedRows: any; // selected todo
-  loading = false; // table is loading
   /** Todo列表 */
   shareList: any = [];
   /** Todo列表 table欄位 */
@@ -270,3 +277,5 @@ export class AppComponent implements OnInit {
     this.primengConfig.ripple = true;
   }
 }
+
+
