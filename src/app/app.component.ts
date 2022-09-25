@@ -101,7 +101,7 @@ export class AppComponent implements OnInit {
   }
 
   // 排序時間
-  sortByTime(arr: []) {
+  sortByTime(arr: {}[]) {
     arr.sort((a: any, b: any) => {
       return <any>new Date(b.time) - <any>new Date(a.time);
     })
@@ -198,7 +198,7 @@ export class AppComponent implements OnInit {
     ).subscribe((res) => {
       this.messageService.add({
         severity: 'success',
-        summary: 'Done success',
+        summary: 'Change success',
         detail: '',
         icon: 'bounce animated',
         life: 3000,
@@ -208,20 +208,20 @@ export class AppComponent implements OnInit {
 
 
   createTodo(KEY: string, todo: object) {
-    const todos: any = this.localStorage.load(KEY);
+    const todos: {}[] = this.localStorage.load(KEY);
     todos.push(todo);
     this.localStorage.save(KEY, todos);
   }
 
   readTodo(KEY: string) {
-    const todos: any = this.localStorage.load(KEY);
+    const todos: {}[] = this.localStorage.load(KEY);
     this.sortByTime(todos);
     this.shareList = todos;
     this.initSelect();
   }
 
-  updateTodo(KEY: string, tId: string, content: any) {
-    let todos: any = this.localStorage.load(KEY);
+  updateTodo(KEY: string, tId: string, content: string) {
+    let todos: {}[] = this.localStorage.load(KEY);
     todos.map((item: any) => {
       if (item.tId === tId) { item.content = content }
       return item
@@ -231,7 +231,7 @@ export class AppComponent implements OnInit {
   }
 
   deleteTodo(KEY: string, tId: string) {
-    const todos: any = this.localStorage.load(KEY);
+    const todos: {}[] = this.localStorage.load(KEY);
     let idx = todos.findIndex((item: any) => item.tId === tId);
     const spliceTodo = todos.splice(idx, 1);
     this.localStorage.save(KEY, todos);
@@ -240,7 +240,7 @@ export class AppComponent implements OnInit {
 
 
   closeTodo(KEY: string, tId: string) {
-    let todos: any = this.localStorage.load(KEY);
+    let todos: {}[] = this.localStorage.load(KEY);
     todos.map((item: any) => {
       if (item.tId === tId) { item.done = !item.done }
       return item
@@ -256,7 +256,7 @@ export class AppComponent implements OnInit {
   }
 
   filterList(filter: string) {
-    const todos: any = this.localStorage.load('initTodo');
+    const todos: {}[] = this.localStorage.load('initTodo');
     // all, active, done
     if (filter === 'all') { return todos; }
     if (filter === 'active') { return todos.filter((todo: any) => !todo.done) }
